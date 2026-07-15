@@ -1,4 +1,3 @@
-# Bible_test
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -32,37 +31,64 @@
             text-align: center;
             color: var(--primary-color);
             font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
             margin-bottom: 30px;
         }
-        .quiz-box, .result-box {
-            margin-bottom: 20px;
+        /* 상단 네비게이션 버튼 (성경 구절 선택용) */
+        .selector-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+            justify-content: center;
         }
-        .question {
-            font-size: 18px;
+        .selector-btn {
+            background-color: #e2e8f0;
+            color: #334155;
+            border: none;
+            padding: 10px 14px;
+            font-size: 14px;
             font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .selector-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        /* 입력 폼 */
+        .verse-input-group {
             margin-bottom: 15px;
-            color: #333;
-            background: #eef2f7;
-            padding: 15px;
-            border-left: 5px solid var(--primary-color);
-            border-radius: 4px;
+        }
+        .verse-label {
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+            display: block;
         }
         textarea {
             width: 100%;
-            height: 120px;
+            height: 70px;
             padding: 12px;
             box-sizing: border-box;
-            border: 2px solid #ddd;
+            border: 2px solid #e2e8f0;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             resize: none;
-            margin-bottom: 15px;
+            font-family: inherit;
         }
         textarea:focus {
             border-color: var(--primary-color);
             outline: none;
         }
-        button {
+        button.submit-btn {
             width: 100%;
             padding: 15px;
             background-color: var(--primary-color);
@@ -72,31 +98,41 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            margin-top: 15px;
         }
-        button:hover {
+        button.submit-btn:hover {
             background-color: #3b5984;
         }
+        /* 결과 박스 */
         .hidden {
             display: none;
         }
-        /* 결과 채점 스타일 */
         .score {
             font-size: 20px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
         }
+        .result-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 15px;
+        }
+        .result-verse-title {
+            font-weight: bold;
+            font-size: 15px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
         .diff-output {
-            padding: 15px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            border: 1px solid #edf2f7;
             border-radius: 8px;
             background: #fafafa;
-            line-height: 1.8;
-            font-size: 16px;
+            line-height: 1.6;
+            font-size: 15px;
             white-space: pre-wrap;
         }
-        /* 틀린 글자 (삭제되어야 할 것) */
         del {
             color: #e74c3c;
             background-color: #fde8e7;
@@ -104,7 +140,6 @@
             font-weight: bold;
             padding: 0 2px;
         }
-        /* 빠진 글자 (추가되어야 할 정답) */
         ins {
             color: #2e7d32;
             background-color: #e8f5e9;
@@ -113,8 +148,8 @@
             padding: 0 2px;
         }
         .guide-text {
-            font-size: 14px;
-            color: #666;
+            font-size: 13px;
+            color: #718096;
             margin-top: 15px;
             text-align: center;
         }
@@ -124,106 +159,194 @@
 
 <div class="container">
     <h1>📖 성경 암기 시험지</h1>
+    <div class="subtitle">해당하는 구절의 버튼을 눌러 시험을 치르세요.</div>
+
+    <!-- 시험 볼 구절 선택 바 -->
+    <div class="selector-box" id="selector-container"></div>
+
+    <hr style="border: 0; height: 1px; background: #e2e8f0; margin-bottom: 25px;">
 
     <!-- 시험 보는 화면 -->
-    <div id="quiz-section" class="quiz-box">
-        <div id="question" class="question">문제를 불러오는 중...</div>
-        <textarea id="user-input" placeholder="여기에 성경 구절을 토씨 하나 틀리지 않게 입력하세요."></textarea>
-        <button onclick="submitAnswer()">시험지 제출하기</button>
+    <div id="quiz-section">
+        <h2 id="current-title" style="font-size: 18px; color: #2d3748; margin-bottom: 20px; text-align: center;"></h2>
+        <div id="inputs-container"></div>
+        <button class="submit-btn" onclick="submitAnswer()">시험지 제출 및 채점</button>
     </div>
 
     <!-- 결과 화면 -->
-    <div id="result-section" class="result-box hidden">
+    <div id="result-section" class="hidden">
         <div id="score-display" class="score"></div>
-        <h3>채점 결과 (오답 분석):</h3>
-        <div id="diff-display" class="diff-output"></div>
+        <h3 style="font-size: 16px; color: #2d3748;">채점 결과 (오답 분석):</h3>
+        <div id="results-container"></div>
         
         <p class="guide-text">
             <span style="color: #e74c3c; font-weight: bold;">빨간 취소선</span>은 잘못 입력한 글자, 
             <span style="color: #2e7d32; font-weight: bold;">초록 밑줄</span>은 빠뜨린 글자입니다.
         </p>
-        <button onclick="nextQuestion()" style="margin-top: 20px; background-color: #2ecc71;">다음 문제 풀기</button>
+        <button class="submit-btn" onclick="retryQuiz()" style="background-color: #4a5568;">다시 도전하기</button>
     </div>
 </div>
 
 <script>
-    // 테스트용 성경 구절 데이터베이스 (필요한 만큼 늘리시면 됩니다)
+    // 5가지 성경 구절 데이터베이스 (각 절이 배열 형태로 깔끔하게 분리되어 있습니다)
     const bibleData = [
-        { id: 1, address: "요한복음 3장 16절", text: "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다 멸망하지 않고 영생을 얻게 하려 하심이라" },
-        { id: 2, address: "창세기 1장 1절", text: "태초에 하나님이 천지를 창조하시니라" },
-        { id: 3, address: "로마서 8장 28절", text: "우리가 알거니와 하나님을 사랑하는 자 곧 그의 뜻대로 부르심을 입은 자들에게는 모든 것이 합력하여 선을 이루느니라" }
+        {
+            id: "rev1",
+            range: "계 1:1~3",
+            verses: [
+                { num: "1절", text: "예수 그리스도의 계시라 이는 하나님이 그에게 주사 반드시 속히 일어날 일들을 그 종들에게 보이시려고 그의 천사를 그 종 요한에게 보내어 알게 하신 것이라" },
+                { num: "2절", text: "요한은 하나님의 말씀과 예수 그리스도의 증거 곧 자기가 본 것을 다 증언하였느니라" },
+                { num: "3절", text: "이 예언의 말씀을 읽는 자와 듣는 자들과 그 가운데에 기록한 것을 지키는 자는 복이 있나니 때가 가까움이라" }
+            ]
+        },
+        {
+            id: "rev7",
+            range: "계 7:1~4",
+            verses: [
+                { num: "1절", text: "이 일 후에 내가 네 천사가 땅 네 모퉁이에 선 것을 보니 땅의 사방의 바람을 붙잡아 바람으로 하여금 땅에나 바다에나 각종 나무에 불지 못하게 하더라" },
+                { num: "2절", text: "또 보매 다른 천사가 살아 계신 하나님의 인을 가지고 해 돋는 데로부터 올라와서 땅과 바다를 해롭게 할 권세를 받은 네 천사를 향하여 큰 소리로 외쳐" },
+                { num: "3절", text: "이르되 우리가 우리 하나님의 종들의 이마에 인치기까지 땅이나 바다나 나무들을 해하지 말라 하더라" },
+                { num: "4절", text: "내가 인침을 받은 자의 수를 들으니 이스라엘 자손의 각 지파 중에서 인침을 받은 자들이 십사만 사천이니" }
+            ]
+        },
+        {
+            id: "rev10",
+            range: "계 10:10~11",
+            verses: [
+                { num: "10절", text: "내가 천사의 손에서 작은 두루마리를 갖다 먹어 버리니 내 입에는 꿀 같이 다나 먹은 후에 내 배에서는 쓰게 되더라" },
+                { num: "11절", text: "그가 내게 말하기를 네가 많은 백성과 나라와 방언과 임금에게 다시 예언하여야 하리라 하더라" }
+            ]
+        },
+        {
+            id: "rev20",
+            range: "계 20:4~6",
+            verses: [
+                { num: "4절", text: "또 내가 보좌들을 보니 거기에 앉은 자들이 있어 심판하는 권세를 받았더라 또 내가 보니 예수를 증언함과 하나님의 말씀 때문에 목 베임을 당한 자들의 영혼들과 또 짐승과 그의 우상에게 경배하지 아니하고 그들의 이마와 손에 그의 표를 받지 아니한 자들이 살아서 그리스도와 더불어 천 년 동안 왕 노릇 하니" },
+                { num: "5절", text: "（그 나머지 죽은 자들은 그 천 년이 차기까지 살지 못하더라） 이는 첫째 부활이라" },
+                { num: "6절", text: "이 첫째 부활에 참여하는 자들은 복이 있고 거룩하도다 둘째 사망이 그들을 다스리는 권세가 없고 도리어 그들이 하나님과 그리스도의 제사장이 되어 천 년 동안 그리스도와 더불어 왕 노릇 하리라" }
+            ]
+        },
+        {
+            id: "rev22",
+            range: "계 22:18~19",
+            verses: [
+                { num: "18절", text: "내가 이 두루마리의 예언의 말씀을 듣는 모든 사람에게 증언하노니 만일 누구든지 이것들 외에 더하면 하나님이 이 두루마리에 기록된 재앙들을 그에게 더하실 것이요" },
+                { num: "19절", text: "만일 누구든지 이 두루마리의 예언의 말씀에서 제하여 버리면 하나님이 이 두루마리에 기록된 생명나무와 및 거룩한 성에 참여함을 제하여 버리시리라" }
+            ]
+        }
     ];
 
-    let currentQuestion = {};
+    let currentQuizIndex = 0;
 
-    // 시험 시작 및 문제 출제
-    function loadQuestion() {
-        // 랜덤으로 문제 추출
-        const randomIndex = Math.floor(Math.random() * bibleData.length);
-        currentQuestion = bibleData[randomIndex];
+    // 상단 성경 구절 선택 버튼 생성
+    function initSelector() {
+        const container = document.getElementById('selector-container');
+        container.innerHTML = '';
         
-        document.getElementById('question').innerText = `[문제] 다음 구절을 작성하세요: \n${currentQuestion.address}`;
-        document.getElementById('user-input').value = '';
+        bibleData.forEach((data, index) => {
+            const btn = document.createElement('button');
+            btn.className = `selector-btn ${index === currentQuizIndex ? 'active' : ''}`;
+            btn.innerText = data.range;
+            btn.onclick = () => selectQuiz(index);
+            container.appendChild(btn);
+        });
+    }
+
+    // 선택한 성경 시험지 로드
+    function selectQuiz(index) {
+        currentQuizIndex = index;
+        initSelector(); // 버튼 활성화 상태 표시 업데이트
         
-        // 화면 초기화
+        const quiz = bibleData[index];
+        document.getElementById('current-title').innerText = `📝 ${quiz.range} 암기 시험`;
+        
+        const inputsContainer = document.getElementById('inputs-container');
+        inputsContainer.innerHTML = '';
+
+        // 각 절마다 입력창(Label + Textarea) 개별 생성
+        quiz.verses.forEach((verse, i) => {
+            const group = document.createElement('div');
+            group.className = 'verse-input-group';
+            group.innerHTML = `
+                <label class="verse-label" for="verse-input-${i}">${verse.num}</label>
+                <textarea id="verse-input-${i}" placeholder="${verse.num} 말씀을 입력하세요."></textarea>
+            `;
+            inputsContainer.appendChild(group);
+        });
+
+        // 화면 상태 초기화
         document.getElementById('quiz-section').classList.remove('hidden');
         document.getElementById('result-section').classList.add('hidden');
     }
 
-    // 채점하기 버튼 동작
+    // 채점하기
     function submitAnswer() {
-        const userAnswer = document.getElementById('user-input').value.trim();
-        const correctAnswer = currentQuestion.text.trim();
+        const quiz = bibleData[currentQuizIndex];
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.innerHTML = '';
 
-        if (!userAnswer) {
-            alert("답안을 입력해주세요!");
-            return;
-        }
-
-        // 100% 일치 여부 확인
-        const isPerfect = (userAnswer === correctAnswer);
-        const scoreDisplay = document.getElementById('score-display');
-        
-        if (isPerfect) {
-            scoreDisplay.innerHTML = "🎉 <span style='color: #2ecc71;'>100점 만점!</span> 완벽하게 암기하셨습니다.";
-        } else {
-            scoreDisplay.innerHTML = "❌ <span style='color: #e74c3c;'>틀린 부분이 있습니다.</span> 다시 확인해보세요.";
-        }
-
-        // 구글 diff_match_patch를 이용해 글자 단위 비교 진행
+        let allPerfect = true;
         const dmp = new diff_match_patch();
-        const diffs = dmp.diff_main(userAnswer, correctAnswer);
-        dmp.diff_cleanupSemantic(diffs); // 사람이 읽기 편하게 그룹화
 
-        // 비교 결과를 HTML 태그로 변환
-        // diff_main 결과 구조: [-1: 삭제(잘못 입력한것), 1: 추가(빠진 정답), 0: 일치]
-        let htmlResult = "";
-        diffs.forEach(diff => {
-            const operation = diff[0];
-            const text = diff[1];
-            
-            if (operation === -1) {
-                htmlResult += `<del>${text}</del>`; // 사용자가 잘못 쓴 글자 -> 빨간 취소선
-            } else if (operation === 1) {
-                htmlResult += `<ins>${text}</ins>`; // 원본에 있어야 할 글자 -> 초록 밑줄
-            } else {
-                htmlResult += text; // 맞춘 글자 -> 일반 텍스트
+        quiz.verses.forEach((verse, i) => {
+            const userInput = document.getElementById(`verse-input-${i}`).value.trim();
+            const correctAnswer = verse.text.trim();
+
+            if (userInput !== correctAnswer) {
+                allPerfect = false;
             }
+
+            // 글자 비교 연산
+            const diffs = dmp.diff_main(userInput, correctAnswer);
+            dmp.diff_cleanupSemantic(diffs);
+
+            let htmlResult = "";
+            diffs.forEach(diff => {
+                const operation = diff[0];
+                const text = diff[1];
+                if (operation === -1) {
+                    htmlResult += `<del>${text}</del>`;
+                } else if (operation === 1) {
+                    htmlResult += `<ins>${text}</ins>`;
+                } else {
+                    htmlResult += text;
+                }
+            });
+
+            // 개별 절마다 채점 결과 레이아웃 생성
+            const resultItem = document.createElement('div');
+            resultItem.className = 'result-item';
+            resultItem.innerHTML = `
+                <div class="result-verse-title">${verse.num}</div>
+                <div class="diff-output">${htmlResult || '<span style="color: #aaa;">(입력 내용 없음)</span>'}</div>
+            `;
+            resultsContainer.appendChild(resultItem);
         });
 
-        // 화면 전환 및 결과 출력
-        document.getElementById('diff-display').innerHTML = htmlResult;
+        // 총평 표시
+        const scoreDisplay = document.getElementById('score-display');
+        if (allPerfect) {
+            scoreDisplay.innerHTML = "🎉 <span style='color: #2e7d32;'>100점 만점!</span><br>토씨 하나 틀리지 않고 완벽하게 외우셨습니다!";
+        } else {
+            scoreDisplay.innerHTML = "❌ <span style='color: #e74c3c;'>틀린 부분이 있습니다.</span><br>아래 오답 분석을 확인하세요.";
+        }
+
+        // 화면 전환
         document.getElementById('quiz-section').classList.add('hidden');
         document.getElementById('result-section').classList.remove('hidden');
+        window.scrollTo(0, 0);
     }
 
-    // 다음 문제로 넘어가기
-    function nextQuestion() {
-        loadQuestion();
+    // 다시 풀기
+    function retryQuiz() {
+        selectQuiz(currentQuizIndex);
     }
 
-    // 페이지 로드 시 첫 문제 실행
-    window.onload = loadQuestion;
+    // 시작 시 첫 번째 시험 로드
+    window.onload = () => {
+        initSelector();
+        selectQuiz(0);
+    };
 </script>
 
 </body>
