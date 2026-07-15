@@ -298,7 +298,12 @@
                 const userInput = document.getElementById(`input-${sIdx}-${vIdx}`).value.trim();
                 const correctAnswer = verse.text.trim();
 
-                const isCorrect = (userInput === correctAnswer);
+            // 띄어쓰기(공백)를 모두 제거한 뒤 비교하기 위해 임시 변수 생성
+                const cleanUser = userInput.replace(/\s+/g, '');
+                const cleanCorrect = correctAnswer.replace(/\s+/g, '');
+
+            // 이제 띄어쓰기가 없다고 가정하고 정답 여부를 판정합니다 (인맞은 == 인 맞은)
+                const isCorrect = (cleanUser === cleanCorrect);
                 if (isCorrect) {
                     perfectVerses++;
                 }
