@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
     <style>
         :root {
-            bg: #FFFDF3;          /* 전체 배경 - 아주 연한 크림 */
+            bg: #FFFAE8;          /* 전체 배경 */
             card: #FFFFFF;        /* 카드 */
             primary: #D98A00;     /* 오렌지/골드 */
             primary-light: #FFF3D2; /* 안내 박스 */
@@ -174,7 +174,7 @@
 
 <div class="container">
     <h1>📖 요한계시록 핵심 암기 시험</h1>
-    <div class="subtitle">모든 구절(총 5문항, 14개 절)을 암기하여 작성한 뒤 제출해 주세요.</div>
+    <div class="subtitle">모든 구절(총 5문항, 10개 절)을 암기하여 작성한 뒤 제출해 주세요.</div>
 
     <!-- 1. 시험 보는 화면 (전체 리스트가 노출됨) -->
     <div id="quiz-section">
@@ -228,14 +228,14 @@
             range: "계 18:7~8",
             verses: [
                 { num: "7절", text: "그가 어떻게 자기를 영화롭게 하였으며 사치하였든지 그만큼 고난과 애통으로 갚아 주라 그가 마음에 말하기를 나는 여황으로 앉은 자요 과부가 아니라 결단코 애통을 당하지 아니하리라 하니" },
-                { num: "8절", text: "(그러므로 하루 동안에 그 재앙들이 이르리니 곧 사망과 애통과 흉년이라 그가 또한 불에 살라지리니 그를 심판하신 주 하나님은 강하신 자이심이니라" }
+                { num: "8절", text: "그러므로 하루 동안에 그 재앙들이 이르리니 곧 사망과 애통과 흉년이라 그가 또한 불에 살라지리니 그를 심판하신 주 하나님은 강하신 자이심이니라" }
             ]
         },
         {
             range: "계 22:15~16",
             verses: [
-                { num: "18절", text: "개들과 술객들과 행음자들과 살인자들과 우상 숭배자들과 및 거짓말을 좋아하며 지어내는 자마다 성밖에 있으리라" },
-                { num: "19절", text: "나 예수는 교회들을 위하여 내 사자를 보내어 이것들을 너희에게 증거하게 하였노라 나는 다윗의 뿌리요 자손이니 곧 광명한 새벽별이라 하시더라" }
+                { num: "15절", text: "개들과 술객들과 행음자들과 살인자들과 우상 숭배자들과 및 거짓말을 좋아하며 지어내는 자마다 성밖에 있으리라" },
+                { num: "16절", text: "나 예수는 교회들을 위하여 내 사자를 보내어 이것들을 너희에게 증거하게 하였노라 나는 다윗의 뿌리요 자손이니 곧 광명한 새벽별이라 하시더라" }
             ]
         }
     ];
@@ -357,7 +357,7 @@
 
         if (perfectVerses === totalVerses) {
             scoreTitle.innerHTML = "🎉 <span style='color: #2e7d32;'>100점 만점!</span>";
-            scoreDetail.innerText = "모든 구절(총 14개 절)을 완벽하게 맞추셨습니다!";
+            scoreDetail.innerText = "모든 구절(총 10개 절)을 완벽하게 맞추셨습니다!";
         } else {
             scoreTitle.innerHTML = "📝 <span style='color: #e74c3c;'>오답을 확인해 보세요!</span>";
             scoreDetail.innerHTML = `총 ${totalVerses}개 구절 중 <strong>${perfectVerses}개 구절</strong>을 완벽히 맞췄습니다.`;
