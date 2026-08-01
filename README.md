@@ -20,7 +20,7 @@
         }
         body {
             font-family: 'Malgun Gothic', sans-serif;
-            background-color: var(--bg-color);
+            background-color: #FFFAE8;
             margin: 0;
             padding: 20px;
             display: flex;
